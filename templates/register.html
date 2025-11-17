@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign up - Pet Care Reminder</title>
+
+    <style>
+        /* Full-page gradient background */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #100f1c, #3d2a7a, #000000);
+            color: #333;
+        }
+
+        /* Pink card */
+        .auth-card {
+            width: 360px;
+            background: #f9c7d6; /* soft pink */
+            border-radius: 24px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+            padding: 40px 30px 32px;
+            position: relative;
+        }
+
+        /* Circle dog picture */
+        .auth-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Title */
+        .auth-title {
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Input groups */
+        .auth-input-group {
+            margin-bottom: 18px;
+        }
+
+        .auth-label {
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            display: block;
+            color: #5b4449;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: none;
+            outline: none;
+            background: #fde3ec;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+
+        .auth-input:focus {
+            box-shadow: 0 0 0 2px rgba(177, 93, 93, 0.8);
+        }
+
+        /* Checkbox row */
+        .auth-checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: #6a5558;
+            margin-bottom: 8px;
+        }
+
+        .auth-checkbox-row input[type="checkbox"] {
+            accent-color: #b6534d;
+        }
+
+        /* Button */
+        .auth-btn {
+            width: 100%;
+            border-radius: 999px;
+            border: none;
+            padding: 10px 0;
+            margin-top: 10px;
+            background: #b6534d; /* reddish button */
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .auth-btn:hover {
+            background: #a2443e;
+        }
+
+        /* Small text */
+        .auth-small {
+            font-size: 0.8rem;
+            color: #6a5558;
+            margin-top: 14px;
+            text-align: center;
+        }
+
+        .auth-small a {
+            color: #8a2f2b;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .auth-small a:hover {
+            text-decoration: underline;
+        }
+
+        /* Error message (for later) */
+        .auth-error {
+            background: #ffdde0;
+            color: #6d1818;
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-card">
+    <!-- Dog avatar circle -->
+    <div class="auth-avatar"
+         style="background-image: url('{{ url_for('static', filename='images/pets.jpeg') }}');">
+    </div>
+
+    <h2 class="auth-title">Sign Up</h2>
+
+    {% if error %}
+      <div class="auth-error">
+        {{ error }}
+      </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('register') }}">
+        <div class="auth-input-group">
+            <label for="email" class="auth-label">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="auth-input"
+              placeholder="you@example.com"
+              required
+            >
+        </div>
+
+        <div class="auth-input-group">
+            <label for="password" class="auth-label">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="auth-input"
+              placeholder="Create a password"
+              required
+            >
+        </div>
+
+        <div class="auth-input-group">
+            <label for="confirm_password" class="auth-label">Confirm Password</label>
+            <input
+              type="password"
+              id="confirm_password"
+              name="confirm_password"
+              class="auth-input"
+              placeholder="Repeat your password"
+              required
+            >
+        </div>
+
+        <div class="auth-input-group auth-checkbox-row">
+            <input type="checkbox" id="terms" name="terms" required>
+            <label for="terms">I accept the terms and policy</label>
+        </div>
+
+        <button type="submit" class="auth-btn">Sign Up</button>
+    </form>
+
+    <p class="auth-small">
+        Already a member?
+        <a href="{{ url_for('login') }}">Sign in</a>
+    </p>
+</div>
+
+</body>
+</html>

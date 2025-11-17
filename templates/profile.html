@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile - Pet Care Reminder</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f6;
+        }
+
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            background: #f7bccc;
+            border-bottom: 1px solid #e09cad;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f38aa6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .app-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #4c3f45;
+        }
+
+        .header-tabs {
+            display: flex;
+            gap: 18px;
+        }
+
+        .header-tab {
+            font-size: 0.95rem;
+            color: #6b5a60;
+            padding-bottom: 3px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .header-tab.active {
+            font-weight: bold;
+            border-bottom: 2px solid #b6534d;
+            color: #3b2d32;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-name-top {
+            font-size: 0.9rem;
+            color: #4c3f45;
+            text-align: right;
+        }
+
+        .profile-role-top {
+            font-size: 0.75rem;
+            color: #8b7a81;
+        }
+
+        .profile-avatar-top {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+        }
+
+        .logout-link {
+            font-size: 0.8rem;
+            color: #8a2f2b;
+            text-decoration: none;
+        }
+
+        .logout-link:hover {
+            text-decoration: underline;
+        }
+
+        .page-body {
+            padding: 20px 24px;
+        }
+
+        .page-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #3c3035;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 0.9rem;
+            color: #7b6c72;
+            margin-bottom: 20px;
+        }
+
+        .profile-layout {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .profile-main-card,
+        .profile-options-card {
+            flex: 1 1 260px;
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .profile-main-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .profile-main-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            border: 3px solid #f7bccc;
+        }
+
+        .profile-main-name {
+            font-weight: bold;
+            color: #3c3035;
+        }
+
+        .profile-main-email {
+            font-size: 0.9rem;
+            color: #7b6c72;
+        }
+
+        .profile-field-label {
+            font-size: 0.8rem;
+            color: #8b7a81;
+            margin-top: 8px;
+        }
+
+        .profile-field-input {
+            width: 100%;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            margin-top: 2px;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+
+        .profile-field-input:focus {
+            outline: none;
+            border-color: #b6534d;
+        }
+
+        .option-group {
+            margin-bottom: 14px;
+        }
+
+        .option-title {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #3c3035;
+            margin-bottom: 4px;
+        }
+
+        .option-desc {
+            font-size: 0.8rem;
+            color: #7b6c72;
+        }
+
+        .option-toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .danger-link {
+            font-size: 0.85rem;
+            color: #b3261e;
+            text-decoration: none;
+        }
+
+        .danger-link:hover {
+            text-decoration: underline;
+        }
+
+        .simple-button {
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid #b6534d;
+            background: #fbe1e7;
+            color: #6c2f35;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .simple-button:hover {
+            background: #f4c4d0;
+        }
+
+        .message-success {
+            background: #e5f6e8;
+            color: #1e7a33;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .message-error {
+            background: #ffdde0;
+            color: #6d1818;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<header class="header-bar">
+    <div class="header-left">
+        <div class="logo-circle">P</div>
+        <div class="app-name">Pet Care Reminder</div>
+    </div>
+
+    <nav class="header-tabs">
+        <a href="{{ url_for('dashboard') }}" class="header-tab">Dashboard</a>
+        <a href="#" class="header-tab">My Pets</a>
+        <a href="#" class="header-tab">Reminders</a>
+        <a href="#" class="header-tab">Analytics</a>
+        <a href="{{ url_for('profile') }}" class="header-tab active">Profile</a>
+    </nav>
+
+    <div class="header-right">
+        <div>
+            <div class="profile-name-top">{{ user_email }}</div>
+            <div class="profile-role-top">Pet Owner</div>
+            <a href="{{ url_for('logout') }}" class="logout-link">Log out</a>
+        </div>
+        <div class="profile-avatar-top"
+             style="background-image: url('{{ avatar_url }}');">
+        </div>
+    </div>
+</header>
+
+<main class="page-body">
+    <h1 class="page-title">My Profile</h1>
+    <p class="page-subtitle">
+        Manage your account details and notification preferences.
+    </p>
+
+    {% if error_message %}
+      <div class="message-error">{{ error_message }}</div>
+    {% endif %}
+    {% if profile_message %}
+      <div class="message-success">{{ profile_message }}</div>
+    {% endif %}
+    {% if password_message %}
+      <div class="message-success">{{ password_message }}</div>
+    {% endif %}
+
+    <div class="profile-layout">
+        <!-- Left: main user info + editable fields -->
+        <section class="profile-main-card">
+            <form method="POST" action="{{ url_for('profile') }}" enctype="multipart/form-data">
+                <input type="hidden" name="form_type" value="profile">
+
+                <div class="profile-main-header">
+                    <div class="profile-main-avatar"
+                         style="background-image: url('{{ avatar_url }}');">
+                    </div>
+                    <div>
+                        <div class="profile-main-name">
+                            {{ user_display_name }}
+                        </div>
+                        <div class="profile-main-email">{{ user_email }}</div>
+                        <div class="profile-main-email">Pet Owner</div>
+                    </div>
+                </div>
+
+                <div class="profile-field-label">Change profile picture</div>
+                <input type="file" name="avatar" class="profile-field-input" accept="image/*">
+
+                <div class="profile-field-label">Full name</div>
+                <input type="text" name="full_name" class="profile-field-input"
+                       value="{{ user_full_name or '' }}">
+
+                <div class="profile-field-label">Primary email</div>
+                <input type="email" name="email" class="profile-field-input"
+                       value="{{ user_email }}">
+
+                <div class="profile-field-label">Home address</div>
+                <input type="text" name="home_address" class="profile-field-input"
+                       value="{{ home_address or '' }}">
+
+                <div class="profile-field-label">Member since</div>
+                <div style="font-size: 0.9rem; color:#3c3035;">
+                    {{ created_at or "Unknown" }}
+                </div>
+
+                <br>
+                <button type="submit" class="simple-button">Save profile</button>
+            </form>
+        </section>
+
+        <!-- Right: options/settings + change password -->
+        <section class="profile-options-card">
+            <div class="option-group">
+                <div class="option-title">Notifications</div>
+                <div class="option-desc">
+                    Choose how you want to receive reminders about pet care tasks.
+                </div>
+                <div class="option-toggle-row">
+                    <input type="checkbox" id="email_reminders" checked>
+                    <label for="email_reminders" style="font-size: 0.85rem;">
+                        Email me reminders (future feature)
+                    </label>
+                </div>
+            </div>
+
+            <div class="option-group">
+                <div class="option-title">Change password</div>
+                <div class="option-desc">
+                    Update the password you use to sign in.
+                </div>
+                <form method="POST" action="{{ url_for('profile') }}">
+                    <input type="hidden" name="form_type" value="password">
+
+                    <div class="profile-field-label">Current password</div>
+                    <input type="password" name="current_password" class="profile-field-input">
+
+                    <div class="profile-field-label">New password</div>
+                    <input type="password" name="new_password" class="profile-field-input">
+
+                    <div class="profile-field-label">Confirm new password</div>
+                    <input type="password" name="confirm_password" class="profile-field-input">
+
+                    <br>
+                    <button type="submit" class="simple-button">Change password</button>
+                </form>
+            </div>
+
+            <div class="option-group">
+                <div class="option-title">Danger zone</div>
+                <div class="option-desc">
+                    Remove this account and all associated pets/reminders.
+                </div>
+                <a href="#" class="danger-link">Delete my account (disabled for now)</a>
+            </div>
+        </section>
+    </div>
+</main>
+
+</body>
+</html>

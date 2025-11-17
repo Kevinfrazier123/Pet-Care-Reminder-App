@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Pet Care Reminder</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f6; /* light grey page background */
+        }
+
+        /* Header bar */
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            background: #f7bccc;           /* soft pink header */
+            border-bottom: 1px solid #e09cad;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f38aa6; /* deeper pink */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .app-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #4c3f45;
+        }
+
+        /* Center tabs */
+        .header-tabs {
+            display: flex;
+            gap: 18px;
+        }
+
+        .header-tab {
+            font-size: 0.95rem;
+            color: #6b5a60;
+            padding-bottom: 3px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .header-tab.active {
+            font-weight: bold;
+            border-bottom: 2px solid #b6534d;
+            color: #3b2d32;
+        }
+
+        .header-tab:hover {
+            color: #3b2d32;
+        }
+
+        /* Right: profile info */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-name {
+            font-size: 0.9rem;
+            color: #4c3f45;
+            text-align: right;
+        }
+
+        .profile-role {
+            font-size: 0.75rem;
+            color: #8b7a81;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+        }
+
+        .logout-link {
+            font-size: 0.8rem;
+            color: #8a2f2b;
+            text-decoration: none;
+        }
+
+        .logout-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Main page content */
+        .page-body {
+            padding: 20px 24px;
+        }
+
+        .page-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #3c3035;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 0.9rem;
+            color: #7b6c72;
+            margin-bottom: 20px;
+        }
+
+        .placeholder-card {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+
+<header class="header-bar">
+    <!-- Left: logo + app name -->
+    <div class="header-left">
+        <div class="logo-circle">P</div>
+        <div class="app-name">Pet Care Reminder</div>
+    </div>
+
+    <!-- Center: tabs -->
+    <nav class="header-tabs">
+        <a href="{{ url_for('dashboard') }}" class="header-tab active">Dashboard</a>
+        <a href="#" class="header-tab">My Pets</a>
+        <a href="#" class="header-tab">Reminders</a>
+        <a href="#" class="header-tab">Analytics</a>
+        <a href="{{ url_for('profile') }}" class="header-tab">My Profile</a>
+
+    </nav>
+
+    <!-- Right: profile area (clickable) + logout -->
+    <div class="header-right">
+        <!-- Wrap name + avatar in link to /profile -->
+        <a href="{{ url_for('profile') }}"
+           style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
+            <div>
+                <div class="profile-name">{{ session.get('user_email', 'Pet Parent') }}</div>
+                <div class="profile-role">
+                    {% if session.get('is_admin') %}
+                        Admin
+                    {% else %}
+                        Pet Owner
+                    {% endif %}
+                </div>
+            </div>
+            <div class="profile-avatar"
+                style="background-image: url('{{ avatar_url }}');">
+            </div>
+        </a>
+
+        <a href="{{ url_for('logout') }}" class="logout-link">Log out</a>
+    </div>
+</header>
+
+<main class="page-body">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">
+        Here you’ll see your pets, upcoming vaccinations, and reminders.
+    </p>
+
+    <div class="placeholder-card">
+        <p>This is a placeholder dashboard card. Later we’ll show:</p>
+        <ul>
+            <li>Your pets with quick info</li>
+            <li>Upcoming care tasks</li>
+            <li>Links to add new pets and reminders</li>
+        </ul>
+    </div>
+</main>
+
+</body>
+</html>

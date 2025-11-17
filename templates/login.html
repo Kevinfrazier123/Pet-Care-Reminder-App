@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign in - Pet Care Reminder</title>
+
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #100f1c, #3d2a7a, #000000);
+            color: #333;
+        }
+
+        .auth-card {
+            width: 360px;
+            background: #f9c7d6;
+            border-radius: 24px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+            padding: 40px 30px 32px;
+            position: relative;
+        }
+
+        .auth-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-title {
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .auth-input-group {
+            margin-bottom: 18px;
+        }
+
+        .auth-label {
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            display: block;
+            color: #5b4449;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: none;
+            outline: none;
+            background: #fde3ec;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+
+        .auth-input:focus {
+            box-shadow: 0 0 0 2px rgba(177, 93, 93, 0.8);
+        }
+
+        .auth-btn {
+            width: 100%;
+            border-radius: 999px;
+            border: none;
+            padding: 10px 0;
+            margin-top: 10px;
+            background: #b6534d;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .auth-btn:hover {
+            background: #a2443e;
+        }
+
+        .auth-small {
+            font-size: 0.8rem;
+            color: #6a5558;
+            margin-top: 14px;
+            text-align: center;
+        }
+
+        .auth-small a {
+            color: #8a2f2b;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .auth-small a:hover {
+            text-decoration: underline;
+        }
+
+        .auth-error {
+            background: #ffdde0;
+            color: #6d1818;
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-card">
+    <div class="auth-avatar"
+         style="background-image: url('{{ url_for('static', filename='images/pets.jpeg') }}');">
+    </div>
+
+    <h2 class="auth-title">Sign in</h2>
+
+    {% if error %}
+      <div class="auth-error">
+        {{ error }}
+      </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('login') }}">
+        <div class="auth-input-group">
+            <label for="email" class="auth-label">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="auth-input"
+              placeholder="you@example.com"
+              required
+            >
+        </div>
+
+        <div class="auth-input-group">
+            <label for="password" class="auth-label">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="auth-input"
+              placeholder="Enter your password"
+              required
+            >
+        </div>
+
+        <button type="submit" class="auth-btn">Sign in</button>
+    </form>
+
+    <p class="auth-small">
+        Don’t have an account yet?
+        <a href="{{ url_for('register') }}">Sign up</a>
+    </p>
+</div>
+
+</body>
+</html>
