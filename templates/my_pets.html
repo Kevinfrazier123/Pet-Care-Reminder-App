@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Pets - Pet Care Reminder</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f6;
+        }
+
+        /* Header bar (same as dashboard) */
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            background: #f7bccc;
+            border-bottom: 1px solid #e09cad;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f38aa6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .app-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #4c3f45;
+        }
+
+        .header-tabs {
+            display: flex;
+            gap: 18px;
+        }
+
+        .header-tab {
+            font-size: 0.95rem;
+            color: #6b5a60;
+            padding-bottom: 3px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .header-tab.active {
+            font-weight: bold;
+            border-bottom: 2px solid #b6534d;
+            color: #3b2d32;
+        }
+
+        .header-tab:hover {
+            color: #3b2d32;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-name {
+            font-size: 0.9rem;
+            color: #4c3f45;
+            text-align: right;
+        }
+
+        .profile-role {
+            font-size: 0.75rem;
+            color: #8b7a81;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+        }
+
+        .logout-link {
+            font-size: 0.8rem;
+            color: #8a2f2b;
+            text-decoration: none;
+        }
+
+        .logout-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Page body */
+        .page-body {
+            padding: 20px 24px;
+        }
+
+        .page-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #3c3035;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 0.9rem;
+            color: #7b6c72;
+            margin-bottom: 20px;
+        }
+
+        .layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            flex: 1 1 280px;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            color: #3c3035;
+        }
+
+        .form-field-label {
+            font-size: 0.85rem;
+            color: #8b7a81;
+            margin-top: 8px;
+        }
+
+        .form-field-input,
+        .form-field-textarea,
+        .form-field-select {
+            width: 100%;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            margin-top: 2px;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+
+        .form-field-textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .form-field-input:focus,
+        .form-field-textarea:focus,
+        .form-field-select:focus {
+            outline: none;
+            border-color: #b6534d;
+        }
+
+        .simple-button {
+            margin-top: 12px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid #b6534d;
+            background: #fbe1e7;
+            color: #6c2f35;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .simple-button:hover {
+            background: #f4c4d0;
+        }
+
+        .pets-list-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .pets-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .pets-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid #ffd6df;
+            flex-shrink: 0;
+        }
+
+        .pets-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pets-name {
+            font-weight: bold;
+            color: #3c3035;
+        }
+
+        .pets-meta {
+            font-size: 0.85rem;
+            color: #7b6c72;
+        }
+
+        .message-success {
+            background: #e5f6e8;
+            color: #1e7a33;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .message-error {
+            background: #ffdde0;
+            color: #6d1818;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<header class="header-bar">
+    <div class="header-left">
+        <div class="logo-circle">P</div>
+        <div class="app-name">Pet Care Reminder</div>
+    </div>
+
+    <nav class="header-tabs">
+        <a href="{{ url_for('dashboard') }}" class="header-tab">Dashboard</a>
+        <a href="{{ url_for('my_pets') }}" class="header-tab active">My Pets</a>
+        <a href="{{ url_for('reminders') }}" class="header-tab">Reminders</a>
+        <a href="{{ url_for('analytics') }}" class="header-tab">Analytics</a>
+        <a href="{{ url_for('profile') }}" class="header-tab">My Profile</a>
+    </nav>
+
+    <div class="header-right">
+        <a href="{{ url_for('profile') }}"
+           style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
+            <div>
+                <div class="profile-name">{{ user_email }}</div>
+                <div class="profile-role">Pet Owner</div>
+            </div>
+            <div class="profile-avatar"
+                 style="background-image: url('{{ avatar_url }}');">
+            </div>
+        </a>
+
+        <a href="{{ url_for('logout') }}" class="logout-link">Log out</a>
+    </div>
+</header>
+
+<main class="page-body">
+    <h1 class="page-title">My Pets</h1>
+    <p class="page-subtitle">
+        Add and manage your pets. These profiles will be used for reminders and analytics later.
+    </p>
+
+    {% if error %}
+      <div class="message-error">{{ error }}</div>
+    {% endif %}
+    {% if message %}
+      <div class="message-success">{{ message }}</div>
+    {% endif %}
+
+    <div class="layout">
+        <!-- Left: Add Pet form -->
+        <section class="card">
+            <h2>Add a new pet</h2>
+
+            <!-- IMPORTANT: enctype added so file upload works -->
+            <form method="POST"
+                  action="{{ url_for('my_pets') }}"
+                  enctype="multipart/form-data">
+
+                <div class="form-field-label">Pet name *</div>
+                <input type="text" name="name" class="form-field-input" required>
+
+                <div class="form-field-label">Species *</div>
+                <select name="species" class="form-field-select" required>
+                    <option value="">-- Select --</option>
+                    <option>Dog</option>
+                    <option>Cat</option>
+                    <option>Bird</option>
+                    <option>Rabbit</option>
+                    <option>Other</option>
+                </select>
+
+                <div class="form-field-label">Breed</div>
+                <input type="text" name="breed" class="form-field-input">
+
+                <div class="form-field-label">Birthdate</div>
+                <input type="date" name="birthdate" class="form-field-input">
+
+                <div class="form-field-label">Weight (e.g., 18 lbs)</div>
+                <input type="text" name="weight" class="form-field-input">
+
+                <div class="form-field-label">Vet name</div>
+                <input type="text" name="vet_name" class="form-field-input">
+
+                <div class="form-field-label">Notes</div>
+                <textarea name="notes" class="form-field-textarea"
+                          placeholder="Allergies, medications, behavior notes..."></textarea>
+
+                <!-- NEW: Pet photo upload -->
+                <div class="form-field-label">Pet photo (optional)</div>
+                <input type="file" name="pet_photo" accept="image/*" class="form-field-input">
+
+                <button type="submit" class="simple-button">Save pet</button>
+            </form>
+        </section>
+
+        <!-- Right: Existing pets -->
+        <section class="card">
+            <h2>Your pets</h2>
+            {% if pets %}
+                {% for pet in pets %}
+                    <div class="pets-list-item">
+                        {% if pet["avatar_filename"] %}
+                            <div class="pets-avatar"
+                                 style="background-image:url('{{ url_for('static', filename='uploads/' ~ pet["avatar_filename"]) }}');">
+                            </div>
+                        {% endif %}
+                        <div class="pets-text">
+                            <div class="pets-name">{{ pet["name"] }}</div>
+                            <div class="pets-meta">
+                                {{ pet["species"] }}
+                                {% if pet["breed"] %} • {{ pet["breed"] }}{% endif %}
+                                {% if pet["birthdate"] %} • Born: {{ pet["birthdate"] }}{% endif %}
+                                {% if pet["weight"] %} • {{ pet["weight"] }}{% endif %}
+                            </div>
+                            {% if pet["vet_name"] %}
+                                <div class="pets-meta">Vet: {{ pet["vet_name"] }}</div>
+                            {% endif %}
+                            {% if pet["notes"] %}
+                                <div class="pets-meta">Notes: {{ pet["notes"] }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="pets-meta">
+                    You haven't added any pets yet. Use the form on the left to add your first pet.
+                </p>
+            {% endif %}
+        </section>
+    </div>
+</main>
+
+</body>
+</html>

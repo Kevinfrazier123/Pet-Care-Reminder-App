@@ -7,12 +7,15 @@ from flask import (
     redirect,
     url_for,
     session,
+    send_from_directory,
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
+from datetime import date
 
 import db
+import time
 
 app = Flask(__name__)
 app.secret_key = "change_this_to_something_secret"
@@ -21,11 +24,17 @@ app.secret_key = "change_this_to_something_secret"
 UPLOAD_FOLDER = os.path.join(app.root_path, "static", "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER  
 
 
 def allowed_file(filename: str) -> bool:
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+@app.route("/uploads/<path:filename>")
+def uploaded_file(filename):
+    """Serve uploaded images (pets, profile, etc.)."""
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 # ---------- helper: login_required decorator ----------
 def login_required(view_func):
@@ -111,12 +120,14 @@ def logout():
 
 
 # ---------- DASHBOARD ----------
+# ---------- DASHBOARD ----------
 @app.route("/dashboard")
 @login_required
 def dashboard():
     user_id = session["user_id"]
     user = db.get_user_by_id(user_id)
 
+    # avatar for header
     if user and user["avatar_filename"]:
         avatar_url = url_for("static", filename=f"uploads/{user['avatar_filename']}")
     else:
@@ -124,10 +135,24 @@ def dashboard():
 
     user_email = user["email"] if user else ""
 
+    # load this user's pets and attach avatar_url for each
+    raw_pets = db.get_pets_for_user(user_id)
+    pets = []
+    for row in raw_pets:
+        pet = dict(row)
+        if pet.get("avatar_filename"):
+            pet["avatar_url"] = url_for(
+                "static", filename=f"uploads/{pet['avatar_filename']}"
+            )
+        else:
+            pet["avatar_url"] = url_for("static", filename="images/default-pet.png")
+        pets.append(pet)
+
     return render_template(
         "dashboard.html",
         avatar_url=avatar_url,
         user_email=user_email,
+        pets=pets,
     )
 
 
@@ -218,6 +243,101 @@ def profile():
         password_message=password_message,
         error_message=error_message,
     )
+
+
+@app.route("/my-pets", methods=["GET", "POST"])
+@login_required
+def my_pets():
+    user_id = session["user_id"]
+    user = db.get_user_by_id(user_id)
+
+    # avatar for header
+    if user and user["avatar_filename"]:
+        avatar_url = url_for("static", filename=f"uploads/{user['avatar_filename']}")
+    else:
+        avatar_url = url_for("static", filename="images/profile-avatar.jpg")
+
+    user_email = user["email"] if user else ""
+
+    message = None
+    error = None
+
+    if request.method == "POST":
+        # Read form values from the Add Pet form
+        name = request.form.get("name", "").strip()
+        species = request.form.get("species", "").strip()
+        breed = request.form.get("breed", "").strip()
+        birthdate = request.form.get("birthdate", "").strip()  # YYYY-MM-DD or empty
+        weight = request.form.get("weight", "").strip()
+        vet_name = request.form.get("vet_name", "").strip()
+        notes = request.form.get("notes", "").strip()
+
+        # ---------- NEW: handle pet photo upload ----------
+        avatar_filename = None
+        photo_file = request.files.get("pet_photo")  # field name in the form
+
+        if photo_file and photo_file.filename and allowed_file(photo_file.filename):
+            safe_name = secure_filename(photo_file.filename)
+            unique_name = f"pet_{user_id}_{int(time.time())}_{safe_name}"
+            photo_file.save(os.path.join(UPLOAD_FOLDER, unique_name))
+            avatar_filename = unique_name
+        # ---------------------------------------------------
+
+        # Basic validation: name + species are required
+        if not name or not species:
+            error = "Pet name and species are required."
+        else:
+            # Create the pet in the DB (now with avatar_filename)
+            db.create_pet(
+                user_id=user_id,
+                name=name,
+                species=species,
+                breed=breed or None,
+                birthdate=birthdate or None,
+                weight=weight or None,
+                vet_name=vet_name or None,
+                notes=notes or None,
+                avatar_filename=avatar_filename,
+            )
+            message = f"Pet '{name}' added successfully."
+
+    # Always load pets after possible insert
+    raw_pets = db.get_pets_for_user(user_id)
+    pets = []
+    for row in raw_pets:
+        pet = dict(row)
+        if pet.get("avatar_filename"):
+            pet["avatar_url"] = url_for(
+                "static", filename=f"uploads/{pet['avatar_filename']}"
+            )
+        else:
+            pet["avatar_url"] = url_for("static", filename="images/default-pet.png")
+        pets.append(pet)
+
+    return render_template(
+        "my_pets.html",
+        avatar_url=avatar_url,
+        user_email=user_email,
+        pets=pets,
+        message=message,
+        error=error,
+    )
+
+
+@app.route("/reminders")
+@login_required
+def reminders():
+    # Simple placeholder for now
+    return "<h1>Reminders</h1><p>This page will show your pet care reminders soon.</p>"
+
+
+@app.route("/analytics")
+@login_required
+def analytics():
+    # Simple placeholder for now
+    return "<h1>Analytics</h1><p>This page will show your pet care stats and charts soon.</p>"
+
+
 
 
 if __name__ == "__main__":
