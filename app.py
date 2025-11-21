@@ -1,5 +1,5 @@
 import os
-
+import json
 from flask import (
     Flask,
     render_template,
@@ -135,7 +135,7 @@ def dashboard():
 
     user_email = user["email"] if user else ""
 
-    # load this user's pets and attach avatar_url for each
+    # -------- Pets for the "My Pets" section --------
     raw_pets = db.get_pets_for_user(user_id)
     pets = []
     for row in raw_pets:
@@ -148,11 +148,27 @@ def dashboard():
             pet["avatar_url"] = url_for("static", filename="images/default-pet.png")
         pets.append(pet)
 
+    # -------- Upcoming reminders for dashboard cards --------
+    # use helper already in db.py: get_upcoming_tasks_for_user
+    upcoming_tasks = db.get_upcoming_tasks_for_user(user_id, limit=3)
+    upcoming_count = len(upcoming_tasks)
+
+    next_due_date = None
+    next_task_title = None
+    if upcoming_tasks:
+        next_task = upcoming_tasks[0]  # soonest due (already ordered in db.py)
+        next_due_date = next_task["due_date"]
+        next_task_title = next_task["title"]
+
     return render_template(
         "dashboard.html",
         avatar_url=avatar_url,
         user_email=user_email,
         pets=pets,
+        upcoming_tasks=upcoming_tasks,
+        upcoming_count=upcoming_count,
+        next_due_date=next_due_date,
+        next_task_title=next_task_title,
     )
 
 
@@ -323,12 +339,121 @@ def my_pets():
         error=error,
     )
 
+@app.route("/my-pets/<int:pet_id>/delete", methods=["POST"])
+@login_required
+def delete_pet(pet_id):
+    user_id = session["user_id"]
 
-@app.route("/reminders")
+    # Only delete if the pet belongs to this user
+    db.delete_pet_for_user(user_id, pet_id)
+
+    return redirect(url_for("my_pets"))
+
+
+@app.route("/reminders", methods=["GET", "POST"])
 @login_required
 def reminders():
-    # Simple placeholder for now
-    return "<h1>Reminders</h1><p>This page will show your pet care reminders soon.</p>"
+    import json
+    user_id = session["user_id"]
+
+    # Load user row
+    user = db.get_user_by_id(user_id)
+
+    # ---------- FIXED AVATAR HANDLING ----------
+    avatar_url = url_for("static", filename="images/profile-avatar.jpg")
+    if user and "avatar_filename" in user.keys() and user["avatar_filename"]:
+        avatar_url = url_for("static", filename=f"uploads/{user['avatar_filename']}")
+
+    user_email = user["email"] if user else ""
+
+    # ---------- CREATE REMINDER ----------
+    message = None
+    error = None
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        due_date = request.form.get("due_date", "").strip()
+        category = request.form.get("category", "").strip()
+        description = request.form.get("description", "").strip()
+        pet_id = request.form.get("pet_id", "").strip()
+        vet_location = request.form.get("vet_location", "").strip()
+
+        if not title or not due_date:
+            error = "A title and due date are required."
+        else:
+            if pet_id == "":
+                pet_id = None
+
+            # Save task
+            db.create_care_task(
+                user_id=user_id,
+                title=title,
+                due_date=due_date,
+                category=category,
+                description=description,
+                pet_id=pet_id
+            )
+
+            message = "Reminder saved successfully."
+
+    # ---------- LOAD REMINDERS ----------
+    conn = db.get_conn()
+    cur = conn.execute(
+        """
+        SELECT ct.*, p.name AS pet_name
+        FROM care_tasks ct
+        LEFT JOIN pets p ON p.id = ct.pet_id
+        WHERE ct.user_id = ?
+        ORDER BY ct.due_date ASC
+        """,
+        (user_id,),
+    )
+    tasks = cur.fetchall()
+    conn.close()
+
+    # ---------- CALENDAR HIGHLIGHTED DATES ----------
+    dates_with_tasks = sorted({row["due_date"] for row in tasks})
+    reminder_dates_json = json.dumps(dates_with_tasks)
+
+    # ---------- GROUP TASKS BY DATE FOR POPUP ----------
+    tasks_by_date = {}
+    for t in tasks:
+        d = t["due_date"]
+        tasks_by_date.setdefault(d, []).append(dict(t))
+
+    tasks_json = json.dumps(tasks_by_date)
+
+    # ---------- LOAD PETS FOR DROPDOWN ----------
+    pets = db.get_pets_for_user(user_id)
+
+    return render_template(
+        "reminders.html",
+        avatar_url=avatar_url,
+        user_email=user_email,
+        tasks=tasks,
+        pets=pets,
+        message=message,
+        error=error,
+        reminder_dates_json=reminder_dates_json,
+        tasks_json=tasks_json
+    )
+
+
+
+@app.route("/reminders/<int:task_id>/complete", methods=["POST"])
+@login_required
+def complete_task(task_id):
+    user_id = session["user_id"]
+    db.mark_task_completed(user_id, task_id)
+    return redirect(url_for("reminders"))
+
+
+@app.route("/reminders/<int:task_id>/delete", methods=["POST"])
+@login_required
+def delete_task(task_id):
+    user_id = session["user_id"]
+    db.delete_task_for_user(user_id, task_id)
+    return redirect(url_for("reminders"))
 
 
 @app.route("/analytics")

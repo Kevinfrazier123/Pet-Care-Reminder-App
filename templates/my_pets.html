@@ -109,14 +109,16 @@
 
         /* Page body */
         .page-body {
-            padding: 20px 24px;
+            padding: 24px;
+            max-width: 1150px;
+            margin: 0 auto;
         }
 
         .page-title {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             font-weight: bold;
             color: #3c3035;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .page-subtitle {
@@ -126,46 +128,59 @@
         }
 
         .layout {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+            gap: 24px;
+            align-items: flex-start;
         }
 
         .card {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-            flex: 1 1 280px;
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 18px 20px 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
         }
 
         .card h2 {
             margin-top: 0;
             font-size: 1.1rem;
             color: #3c3035;
+            margin-bottom: 10px;
+        }
+
+        /* Form styling */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px 16px;
+        }
+
+        .form-grid-full {
+            grid-column: 1 / -1;
         }
 
         .form-field-label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #8b7a81;
-            margin-top: 8px;
+            margin-bottom: 4px;
+            display: block;
         }
 
         .form-field-input,
         .form-field-textarea,
         .form-field-select {
             width: 100%;
-            padding: 6px 10px;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            margin-top: 2px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            border: 1px solid #e1d4d9;
             font-size: 0.9rem;
             box-sizing: border-box;
+            background: #fdf7fa;
         }
 
         .form-field-textarea {
             resize: vertical;
-            min-height: 60px;
+            min-height: 70px;
         }
 
         .form-field-input:focus,
@@ -173,58 +188,111 @@
         .form-field-select:focus {
             outline: none;
             border-color: #b6534d;
+            box-shadow: 0 0 0 1px rgba(182, 83, 77, 0.2);
         }
 
         .simple-button {
-            margin-top: 12px;
-            padding: 8px 14px;
+            margin-top: 14px;
+            padding: 9px 18px;
             border-radius: 999px;
-            border: 1px solid #b6534d;
-            background: #fbe1e7;
-            color: #6c2f35;
+            border: none;
+            background: #b6534d;
+            color: #ffffff;
             font-size: 0.9rem;
             cursor: pointer;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.15);
         }
 
         .simple-button:hover {
-            background: #f4c4d0;
+            background: #a2443e;
         }
 
-        .pets-list-item {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
+        /* Right column: pet cards */
+        .pets-header-row {
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
             align-items: center;
+            margin-bottom: 6px;
         }
 
-        .pets-list-item:last-child {
-            border-bottom: none;
+        .pets-count {
+            font-size: 0.8rem;
+            color: #8b7a81;
         }
 
-        .pets-avatar {
-            width: 40px;
-            height: 40px;
+        .pets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .pet-card {
+            background: #fdfbfc;
+            border-radius: 16px;
+            padding: 14px 12px 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .pet-avatar {
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
             background-size: cover;
             background-position: center;
-            border: 2px solid #ffd6df;
-            flex-shrink: 0;
+            background-color: #ffe1ec;
+            border: 3px solid #ffd6df;
+            margin-bottom: 10px;
         }
 
-        .pets-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .pets-name {
+        .pet-name {
             font-weight: bold;
             color: #3c3035;
+            font-size: 1rem;
+            margin-bottom: 4px;
         }
 
-        .pets-meta {
-            font-size: 0.85rem;
+        .pet-meta {
+            font-size: 0.82rem;
             color: #7b6c72;
+            margin-bottom: 2px;
+        }
+
+        .pet-notes {
+            font-size: 0.8rem;
+            color: #8b7a81;
+            margin-top: 4px;
+        }
+
+        .pet-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .pet-delete-button {
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: none;
+            background: #d9534f;
+            color: #fff;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .pet-delete-button:hover {
+            background: #c64541;
+        }
+
+        .pets-empty {
+            font-size: 0.85rem;
+            color: #8b7a81;
+            margin-top: 14px;
         }
 
         .message-success {
@@ -243,6 +311,12 @@
             border-radius: 6px;
             font-size: 0.85rem;
             margin-bottom: 8px;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -281,7 +355,7 @@
 <main class="page-body">
     <h1 class="page-title">My Pets</h1>
     <p class="page-subtitle">
-        Add and manage your pets. These profiles will be used for reminders and analytics later.
+        Add and manage your pets!
     </p>
 
     {% if error %}
@@ -296,43 +370,59 @@
         <section class="card">
             <h2>Add a new pet</h2>
 
-            <!-- IMPORTANT: enctype added so file upload works -->
             <form method="POST"
                   action="{{ url_for('my_pets') }}"
                   enctype="multipart/form-data">
 
-                <div class="form-field-label">Pet name *</div>
-                <input type="text" name="name" class="form-field-input" required>
+                <div class="form-grid">
+                    <div class="form-grid-full">
+                        <label class="form-field-label">Pet name *</label>
+                        <input type="text" name="name" class="form-field-input" required>
+                    </div>
 
-                <div class="form-field-label">Species *</div>
-                <select name="species" class="form-field-select" required>
-                    <option value="">-- Select --</option>
-                    <option>Dog</option>
-                    <option>Cat</option>
-                    <option>Bird</option>
-                    <option>Rabbit</option>
-                    <option>Other</option>
-                </select>
+                    <div>
+                        <label class="form-field-label">Species *</label>
+                        <select name="species" class="form-field-select" required>
+                            <option value="">-- Select --</option>
+                            <option>Dog</option>
+                            <option>Cat</option>
+                            <option>Bird</option>
+                            <option>Rabbit</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
 
-                <div class="form-field-label">Breed</div>
-                <input type="text" name="breed" class="form-field-input">
+                    <div>
+                        <label class="form-field-label">Breed</label>
+                        <input type="text" name="breed" class="form-field-input">
+                    </div>
 
-                <div class="form-field-label">Birthdate</div>
-                <input type="date" name="birthdate" class="form-field-input">
+                    <div>
+                        <label class="form-field-label">Birthdate</label>
+                        <input type="date" name="birthdate" class="form-field-input">
+                    </div>
 
-                <div class="form-field-label">Weight (e.g., 18 lbs)</div>
-                <input type="text" name="weight" class="form-field-input">
+                    <div>
+                        <label class="form-field-label">Weight (e.g., 18 lbs)</label>
+                        <input type="text" name="weight" class="form-field-input">
+                    </div>
 
-                <div class="form-field-label">Vet name</div>
-                <input type="text" name="vet_name" class="form-field-input">
+                    <div class="form-grid-full">
+                        <label class="form-field-label">Vet name</label>
+                        <input type="text" name="vet_name" class="form-field-input">
+                    </div>
 
-                <div class="form-field-label">Notes</div>
-                <textarea name="notes" class="form-field-textarea"
-                          placeholder="Allergies, medications, behavior notes..."></textarea>
+                    <div class="form-grid-full">
+                        <label class="form-field-label">Notes</label>
+                        <textarea name="notes" class="form-field-textarea"
+                                  placeholder="Allergies, medications, behavior notes..."></textarea>
+                    </div>
 
-                <!-- NEW: Pet photo upload -->
-                <div class="form-field-label">Pet photo (optional)</div>
-                <input type="file" name="pet_photo" accept="image/*" class="form-field-input">
+                    <div class="form-grid-full">
+                        <label class="form-field-label">Pet photo (optional)</label>
+                        <input type="file" name="pet_photo" accept="image/*" class="form-field-input">
+                    </div>
+                </div>
 
                 <button type="submit" class="simple-button">Save pet</button>
             </form>
@@ -340,34 +430,59 @@
 
         <!-- Right: Existing pets -->
         <section class="card">
-            <h2>Your pets</h2>
+            <div class="pets-header-row">
+                <h2>Your pets</h2>
+                <div class="pets-count">
+                    {% if pets %}{{ pets|length }} total{% endif %}
+                </div>
+            </div>
+
             {% if pets %}
-                {% for pet in pets %}
-                    <div class="pets-list-item">
-                        {% if pet["avatar_filename"] %}
-                            <div class="pets-avatar"
-                                 style="background-image:url('{{ url_for('static', filename='uploads/' ~ pet["avatar_filename"]) }}');">
+                <div class="pets-grid">
+                    {% for pet in pets %}
+                        <div class="pet-card">
+                            <div class="pet-avatar"
+                                 {% if pet["avatar_filename"] %}
+                                    style="background-image:url('{{ url_for('static', filename='uploads/' ~ pet['avatar_filename']) }}');"
+                                 {% endif %}>
                             </div>
-                        {% endif %}
-                        <div class="pets-text">
-                            <div class="pets-name">{{ pet["name"] }}</div>
-                            <div class="pets-meta">
+
+                            <div class="pet-name">{{ pet["name"] }}</div>
+                            <div class="pet-meta">
                                 {{ pet["species"] }}
                                 {% if pet["breed"] %} • {{ pet["breed"] }}{% endif %}
-                                {% if pet["birthdate"] %} • Born: {{ pet["birthdate"] }}{% endif %}
-                                {% if pet["weight"] %} • {{ pet["weight"] }}{% endif %}
                             </div>
+
+                            {% if pet["birthdate"] or pet["weight"] %}
+                                <div class="pet-meta">
+                                    {% if pet["birthdate"] %}Born: {{ pet["birthdate"] }}{% endif %}
+                                    {% if pet["birthdate"] and pet["weight"] %} • {% endif %}
+                                    {% if pet["weight"] %}{{ pet["weight"] }}{% endif %}
+                                </div>
+                            {% endif %}
+
                             {% if pet["vet_name"] %}
-                                <div class="pets-meta">Vet: {{ pet["vet_name"] }}</div>
+                                <div class="pet-meta">Vet: {{ pet["vet_name"] }}</div>
                             {% endif %}
+
                             {% if pet["notes"] %}
-                                <div class="pets-meta">Notes: {{ pet["notes"] }}</div>
+                                <div class="pet-notes">{{ pet["notes"] }}</div>
                             {% endif %}
+
+                            <div class="pet-actions">
+                                <form method="POST"
+                                      action="{{ url_for('delete_pet', pet_id=pet['id'], redirect_to='my_pets') }}"
+                                      onsubmit="return confirm('Delete this pet?');">
+                                    <button type="submit" class="pet-delete-button">
+                                        Delete pet
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                </div>
             {% else %}
-                <p class="pets-meta">
+                <p class="pets-empty">
                     You haven't added any pets yet. Use the form on the left to add your first pet.
                 </p>
             {% endif %}

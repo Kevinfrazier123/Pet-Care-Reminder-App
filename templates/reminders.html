@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reminders - Pet Care Reminder</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f6;
+        }
+
+        /* Header bar */
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            background: #f7bccc;
+            border-bottom: 1px solid #e09cad;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .header-left { display:flex; align-items:center; gap:12px; }
+        .logo-circle {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: #f38aa6; display:flex; align-items:center; justify-content:center;
+            color:#fff; font-weight:bold; font-size:1.1rem;
+        }
+        .app-name { font-weight:bold; font-size:1.1rem; color:#4c3f45; }
+        .header-tabs { display:flex; gap:18px; }
+        .header-tab { font-size:0.95rem; color:#6b5a60; padding-bottom:3px; text-decoration:none; }
+        .header-tab.active { font-weight:bold; border-bottom:2px solid #b6534d; color:#3b2d32; }
+        .header-tab:hover { color:#3b2d32; }
+        .header-right { display:flex; align-items:center; gap:12px; }
+        .profile-name { font-size:0.9rem; color:#4c3f45; text-align:right; }
+        .profile-role { font-size:0.75rem; color:#8b7a81; }
+        .profile-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background-size: cover; background-position: center;
+            border:2px solid white; box-shadow:0 0 0 1px rgba(0,0,0,0.15);
+        }
+        .logout-link { font-size:0.8rem; color:#8a2f2b; text-decoration:none; }
+        .logout-link:hover { text-decoration:underline; }
+
+        /* Page body */
+        .page-body { padding:24px; max-width:1150px; margin:0 auto; }
+        .page-title { font-size:1.6rem; font-weight:bold; color:#3c3035; margin-bottom:4px; }
+        .page-subtitle { font-size:0.9rem; color:#7b6c72; margin-bottom:20px; }
+
+        .message-success {
+            background:#e5f6e8;
+            color:#1e7a33;
+            padding:6px 10px;
+            border-radius:6px;
+            font-size:0.85rem;
+            margin-bottom:8px;
+        }
+        .message-error {
+            background:#ffdde0;
+            color:#6d1818;
+            padding:6px 10px;
+            border-radius:6px;
+            font-size:0.85rem;
+            margin-bottom:8px;
+        }
+
+        .reminders-layout {
+            display:grid;
+            grid-template-columns: minmax(0,1.1fr) minmax(0,1.1fr);
+            gap:24px;
+            align-items:flex-start;
+        }
+
+        .panel-card {
+            background:#ffffff;
+            border-radius:18px;
+            padding:18px 20px 20px;
+            box-shadow:0 6px 20px rgba(0,0,0,0.06);
+        }
+
+        .panel-title-row {
+            display:flex;
+            justify-content:space-between;
+            align-items:baseline;
+            margin-bottom:10px;
+        }
+        .panel-title { font-size:1.1rem; font-weight:bold; color:#3c3035; }
+        .panel-subtitle-small { font-size:0.8rem; color:#8b7a81; }
+
+        /* Add reminder form */
+        .form-grid {
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:10px 16px;
+        }
+        .form-grid-full { grid-column:1 / -1; }
+
+        .form-label {
+            display:block;
+            font-size:0.8rem;
+            color:#8b7a81;
+            margin-bottom:4px;
+        }
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width:100%;
+            padding:8px 10px;
+            border-radius:10px;
+            border:1px solid #e1d4d9;
+            font-size:0.9rem;
+            box-sizing:border-box;
+            background:#fdf7fa;
+        }
+        .form-textarea { resize:vertical; min-height:70px; }
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline:none;
+            border-color:#b6534d;
+            box-shadow:0 0 0 1px rgba(182,83,77,0.2);
+        }
+        .button-primary {
+            margin-top:14px;
+            padding:9px 18px;
+            border-radius:999px;
+            border:none;
+            background:#b6534d;
+            color:#ffffff;
+            font-size:0.9rem;
+            cursor:pointer;
+            box-shadow:0 6px 14px rgba(0,0,0,0.15);
+        }
+        .button-primary:hover { background:#a2443e; }
+
+        /* Calendar */
+        .calendar-card { padding-top:4px; }
+        .calendar-header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:10px;
+        }
+        .calendar-title { font-size:0.95rem; font-weight:bold; color:#3c3035; }
+        .calendar-nav button {
+            border:none;
+            background:transparent;
+            cursor:pointer;
+            font-size:0.9rem;
+            color:#6b5a60;
+            padding:2px 6px;
+        }
+        .calendar-nav button:hover { color:#3b2d32; }
+
+        .calendar-grid {
+            display:grid;
+            grid-template-columns:repeat(7,1fr);
+            gap:4px;
+            font-size:0.75rem;
+        }
+        .calendar-day-header {
+            text-align:center;
+            font-weight:bold;
+            color:#8b7a81;
+            padding-bottom:4px;
+        }
+        .calendar-cell {
+            height:26px;
+            border-radius:6px;
+            text-align:center;
+            line-height:26px;
+            background:#f8f4f6;
+            color:#5d4b52;
+            cursor:default;
+        }
+        .calendar-cell.has-reminder {
+            background:#f9c7d6;
+            font-weight:bold;
+            cursor:pointer;
+        }
+        /* ring on selected date */
+        .calendar-cell.selected-date {
+            outline: 2px solid #b6534d;
+            outline-offset: 1px;
+        }
+        .calendar-cell.today { border:1px dashed #b6534d; }
+        .calendar-cell.empty {
+            background:transparent;
+            box-shadow:none;
+        }
+
+        /* Selected day details */
+        .day-details-card {
+            margin-top:16px;
+            border-top:1px solid #f0e3e8;
+            padding-top:14px;
+        }
+
+        .day-details-header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:8px;
+            margin-bottom:4px;
+        }
+
+        .day-details-title {
+            font-size:0.95rem;
+            font-weight:bold;
+            color:#3c3035;
+        }
+
+        .reset-link-btn {
+            border:none;
+            background:transparent;
+            color:#8b7a81;
+            font-size:0.8rem;
+            cursor:pointer;
+            text-decoration:underline;
+        }
+        .reset-link-btn:hover {
+            color:#3b2d32;
+        }
+
+        .empty-text {
+            font-size:0.85rem;
+            color:#8b7a81;
+        }
+        .tasks-list { margin-top:6px; }
+        .task-row {
+            padding:8px 0;
+            border-bottom:1px solid #f0e3e8;
+        }
+        .task-title { font-size:0.9rem; font-weight:bold; color:#3c3035; }
+        .task-meta { font-size:0.8rem; color:#7b6c72; }
+        .task-desc { font-size:0.8rem; color:#8b7a81; margin-top:2px; }
+
+        .task-actions-inline {
+            margin-top:4px;
+            display:flex;
+            gap:6px;
+        }
+        .btn-small {
+            border:none;
+            border-radius:999px;
+            padding:4px 9px;
+            font-size:0.75rem;
+            cursor:pointer;
+        }
+        .btn-complete { background:#4caf50; color:#fff; }
+        .btn-complete:hover { background:#3e9641; }
+        .btn-delete { background:#d9534f; color:#fff; }
+        .btn-delete:hover { background:#c64541; }
+
+        @media (max-width: 900px) {
+            .reminders-layout { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header-bar">
+    <div class="header-left">
+        <div class="logo-circle">P</div>
+        <div class="app-name">Pet Care Reminder</div>
+    </div>
+
+    <nav class="header-tabs">
+        <a href="{{ url_for('dashboard') }}" class="header-tab">Dashboard</a>
+        <a href="{{ url_for('my_pets') }}" class="header-tab">My Pets</a>
+        <a href="{{ url_for('reminders') }}" class="header-tab active">Reminders</a>
+        <a href="{{ url_for('analytics') }}" class="header-tab">Analytics</a>
+        <a href="{{ url_for('profile') }}" class="header-tab">My Profile</a>
+    </nav>
+
+    <div class="header-right">
+        <a href="{{ url_for('profile') }}"
+           style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px;">
+            <div>
+                <div class="profile-name">{{ user_email }}</div>
+                <div class="profile-role">Pet Owner</div>
+            </div>
+            <div class="profile-avatar"
+                 style="background-image:url('{{ avatar_url }}');">
+            </div>
+        </a>
+        <a href="{{ url_for('logout') }}" class="logout-link">Log out</a>
+    </div>
+</header>
+
+<main class="page-body">
+    <h1 class="page-title">Reminders</h1>
+    <p class="page-subtitle">
+        Keep track of vaccines, walks, medications, and more for each pet.
+    </p>
+
+    {% if error %}
+      <div class="message-error">{{ error }}</div>
+    {% endif %}
+    {% if message %}
+      <div class="message-success">{{ message }}</div>
+    {% endif %}
+
+    <div class="reminders-layout">
+        <!-- LEFT: Add Reminder form -->
+        <section class="panel-card">
+            <div class="panel-title-row">
+                <div class="panel-title">Add a new reminder</div>
+                <div class="panel-subtitle-small">
+                    Link tasks to pets and set due dates.
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('reminders') }}">
+                <div class="form-grid">
+                    <div class="form-grid-full">
+                        <label class="form-label">Title *</label>
+                        <input type="text" name="title" class="form-input"
+                               placeholder="Rabies vaccine, Morning walk…" required>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Pet</label>
+                        <select name="pet_id" class="form-select">
+                            <option value="">All pets / general</option>
+                            {% for pet in pets %}
+                                <option value="{{ pet['id'] }}">{{ pet['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Category</label>
+                        <select name="category" class="form-select">
+                            <option value="">Select…</option>
+                            <option>Vaccine</option>
+                            <option>Medication</option>
+                            <option>Walk</option>
+                            <option>Feeding</option>
+                            <option>Grooming</option>
+                            <option>Vet Visit</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Due date *</label>
+                        <input type="date" name="due_date" class="form-input" required>
+                    </div>
+
+                    <div class="form-grid-full" id="vet-location-row" style="display:none;">
+                        <label class="form-label">Vet location (only for vet visits)</label>
+                        <input type="text" name="vet_location" class="form-input"
+                               placeholder="Clinic name, address, room, etc.">
+                    </div>
+
+                    <div class="form-grid-full">
+                        <label class="form-label">Notes (optional)</label>
+                        <textarea name="description" class="form-textarea"
+                                  placeholder="Dose, time of day, instructions, etc."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="button-primary">Save reminder</button>
+            </form>
+        </section>
+
+        <!-- RIGHT: Calendar + Selected day details -->
+        <section class="panel-card">
+            <div class="panel-title-row">
+                <div class="panel-title">Calendar view</div>
+                <div class="panel-subtitle-small">
+                    Click a highlighted date to see reminders.
+                </div>
+            </div>
+
+            <div class="calendar-card">
+                <div class="calendar-header">
+                    <button type="button" id="cal-prev">&lt;</button>
+                    <div id="cal-month-label" class="calendar-title"></div>
+                    <button type="button" id="cal-next">&gt;</button>
+                </div>
+
+                <div class="calendar-grid" id="calendar-grid">
+                    <!-- Filled by JavaScript -->
+                </div>
+            </div>
+
+            <div class="day-details-card">
+                <div class="day-details-header">
+                    <div class="day-details-title" id="selected-date-label">
+                        Select a highlighted date to view reminders.
+                    </div>
+                    <button type="button" id="reset-selection" class="reset-link-btn">
+                        Reset
+                    </button>
+                </div>
+                <div id="day-reminders-list" class="tasks-list">
+                    <p class="empty-text">No date selected.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- Vet location toggle -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      // These must be JSON values from app.py (json.dumps)
+      const reminderDates = {{ reminder_dates_json|safe }};        // ["2025-11-24", ...]
+      const allTasks      = {{ tasks_json|safe }};                 // { "2025-11-24": [ {..}, ... ], ... }
+
+      const dateSet = new Set(reminderDates || []);
+
+      const grid          = document.getElementById('calendar-grid');
+      const label         = document.getElementById('cal-month-label');
+      const btnPrev       = document.getElementById('cal-prev');
+      const btnNext       = document.getElementById('cal-next');
+      const selectedLabel = document.getElementById('selected-date-label');
+      const dayList       = document.getElementById('day-reminders-list');
+      const resetBtn      = document.getElementById('reset-selection');
+
+      if (!grid || !label) return;
+
+      const today = new Date();
+      let currentYear  = today.getFullYear();
+      let currentMonth = today.getMonth();
+      let selectedDate = null;   // currently selected YYYY-MM-DD
+
+      const weekdayLabels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const monthNames = [
+          'January','February','March','April','May','June',
+          'July','August','September','October','November','December'
+      ];
+
+      // --- clear only the selected state + details ---
+      function clearSelectionUI() {
+          selectedDate = null;
+          selectedLabel.textContent = 'Select a highlighted date to view reminders.';
+          dayList.innerHTML = '<p class="empty-text">No date selected.</p>';
+
+          // remove ring from any selected cells
+          grid.querySelectorAll('.calendar-cell.selected-date').forEach(c => {
+              c.classList.remove('selected-date');
+          });
+      }
+
+      // --- reset button: also remove pink highlights ---
+      function resetCalendarView() {
+          clearSelectionUI();
+
+          // remove pink highlight from all reminder dates
+          grid.querySelectorAll('.calendar-cell.has-reminder').forEach(c => {
+              c.classList.remove('has-reminder');
+          });
+      }
+
+      if (resetBtn) {
+          resetBtn.addEventListener('click', resetCalendarView);
+      }
+
+      function showRemindersForDate(dateStr, cellEl) {
+          // Toggle: click same highlighted date again => clear selection
+          if (selectedDate === dateStr) {
+              clearSelectionUI();
+              return;
+          }
+
+          selectedDate = dateStr;
+
+          // UI: mark this cell selected, remove selection from others
+          grid.querySelectorAll('.calendar-cell.selected-date').forEach(c => {
+              c.classList.remove('selected-date');
+          });
+          if (cellEl) {
+              cellEl.classList.add('selected-date');
+          }
+
+          dayList.innerHTML = '';
+
+          // ✅ allTasks is an object keyed by date
+          const tasks = allTasks[dateStr] || [];
+          const niceDate = new Date(dateStr + 'T00:00:00');
+
+          selectedLabel.textContent =
+              'Reminders for ' + niceDate.toLocaleDateString(undefined, {
+                  weekday:'long', year:'numeric', month:'long', day:'numeric'
+              });
+
+          if (!tasks.length) {
+              const p = document.createElement('p');
+              p.className = 'empty-text';
+              p.textContent = 'No reminders on this date.';
+              dayList.appendChild(p);
+              return;
+          }
+
+          tasks.forEach(t => {
+              const row = document.createElement('div');
+              row.className = 'task-row';
+
+              const title = document.createElement('div');
+              title.className = 'task-title';
+              title.textContent = t.title + (t.pet_name ? ' — ' + t.pet_name : '');
+              row.appendChild(title);
+
+              const meta = document.createElement('div');
+              meta.className = 'task-meta';
+              meta.textContent =
+                  (t.category ? t.category + ' • ' : '') +
+                  'Due ' + t.due_date +
+                  (t.status === 'completed' ? ' (completed)' : '');
+              row.appendChild(meta);
+
+              if (t.description) {
+                  const desc = document.createElement('div');
+                  desc.className = 'task-desc';
+                  desc.textContent = t.description;
+                  row.appendChild(desc);
+              }
+
+              // Inline actions
+              const actions = document.createElement('div');
+              actions.className = 'task-actions-inline';
+
+              if (t.status !== 'completed') {
+                  const formDone = document.createElement('form');
+                  formDone.method = 'POST';
+                  formDone.action = '/reminders/' + t.id + '/complete';
+
+                  const btnDone = document.createElement('button');
+                  btnDone.type = 'submit';
+                  btnDone.className = 'btn-small btn-complete';
+                  btnDone.textContent = 'Mark done';
+                  formDone.appendChild(btnDone);
+                  actions.appendChild(formDone);
+              }
+
+              const formDelete = document.createElement('form');
+              formDelete.method = 'POST';
+              formDelete.action = '/reminders/' + t.id + '/delete';
+              formDelete.onsubmit = function () {
+                  return confirm('Delete this reminder?');
+              };
+
+              const btnDel = document.createElement('button');
+              btnDel.type = 'submit';
+              btnDel.className = 'btn-small btn-delete';
+              btnDel.textContent = 'Delete';
+              formDelete.appendChild(btnDel);
+              actions.appendChild(formDelete);
+
+              row.appendChild(actions);
+              dayList.appendChild(row);
+          });
+      }
+
+      function buildCalendar() {
+          grid.innerHTML = '';
+
+          // weekday headers
+          weekdayLabels.forEach(d => {
+              const header = document.createElement('div');
+              header.className = 'calendar-day-header';
+              header.textContent = d;
+              grid.appendChild(header);
+          });
+
+          const firstDay     = new Date(currentYear, currentMonth, 1);
+          const startWeekday = firstDay.getDay();
+          const lastDate     = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+          label.textContent = monthNames[currentMonth] + ' ' + currentYear;
+
+          // empty cells before 1st
+          for (let i = 0; i < startWeekday; i++) {
+              const empty = document.createElement('div');
+              empty.className = 'calendar-cell empty';
+              grid.appendChild(empty);
+          }
+
+          // day cells
+          for (let day = 1; day <= lastDate; day++) {
+              const cell = document.createElement('div');
+              cell.className = 'calendar-cell';
+
+              const mm = String(currentMonth + 1).padStart(2, '0');
+              const dd = String(day).padStart(2, '0');
+              const dateStr = `${currentYear}-${mm}-${dd}`;
+
+              // pink highlight for dates that have tasks
+              if (dateSet.has(dateStr)) {
+                  cell.classList.add('has-reminder');
+                  cell.addEventListener('click', () => showRemindersForDate(dateStr, cell));
+              }
+
+              const isToday =
+                  currentYear === today.getFullYear() &&
+                  currentMonth === today.getMonth() &&
+                  day === today.getDate();
+              if (isToday) {
+                  cell.classList.add('today');
+              }
+
+              cell.textContent = day;
+              grid.appendChild(cell);
+          }
+
+          // switching months only clears selection, not pink data
+          clearSelectionUI();
+      }
+
+      btnPrev.addEventListener('click', function () {
+          currentMonth--;
+          if (currentMonth < 0) {
+              currentMonth = 11;
+              currentYear--;
+          }
+          buildCalendar();
+      });
+
+      btnNext.addEventListener('click', function () {
+          currentMonth++;
+          if (currentMonth > 11) {
+              currentMonth = 0;
+              currentYear++;
+          }
+          buildCalendar();
+      });
+
+      buildCalendar();
+  });
+</script>
+</body>
+</html>

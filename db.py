@@ -180,6 +180,16 @@ def get_pets_for_user(user_id):
     conn.close()
     return rows
 
+def delete_pet_for_user(user_id, pet_id):
+    """Delete a single pet that belongs to this user."""
+    conn = get_conn()
+    conn.execute(
+        "DELETE FROM pets WHERE id = ? AND user_id = ?",
+        (pet_id, user_id),
+    )
+    conn.commit()
+    conn.close()
+
 
 # -----------------------------
 #  CARE TASK FUNCTIONS
@@ -228,3 +238,46 @@ def get_upcoming_tasks_for_user(user_id, limit=5):
     rows = cur.fetchall()
     conn.close()
     return rows
+def get_all_tasks_for_user(user_id):
+    """Return all care tasks (pending + completed) for this user."""
+    conn = get_conn()
+    cur = conn.execute(
+        """
+        SELECT ct.*, p.name AS pet_name
+        FROM care_tasks ct
+        LEFT JOIN pets p ON ct.pet_id = p.id
+        WHERE ct.user_id = ?
+        ORDER BY ct.due_date ASC, ct.created_at ASC
+        """,
+        (user_id,),
+    )
+    rows = cur.fetchall()
+    conn.close()
+    return rows
+
+
+def mark_task_completed(user_id, task_id):
+    """Mark a care task as completed."""
+    conn = get_conn()
+    conn.execute(
+        """
+        UPDATE care_tasks
+        SET status = 'completed',
+            completed_at = ?
+        WHERE id = ? AND user_id = ?
+        """,
+        (datetime.utcnow().isoformat(), task_id, user_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+def delete_task_for_user(user_id, task_id):
+    """Delete a care task that belongs to this user."""
+    conn = get_conn()
+    conn.execute(
+        "DELETE FROM care_tasks WHERE id = ? AND user_id = ?",
+        (task_id, user_id),
+    )
+    conn.commit()
+    conn.close()

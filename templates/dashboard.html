@@ -101,66 +101,6 @@
 
         /* MAIN BODY ------------------------------------- */
         .page-body {
-            padding: 20px 24px;
-        }
-
-        .section {
-            margin-bottom: 28px;
-        }
-
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #3c3035;
-            margin-bottom: 10px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-            margin-bottom: 16px;
-        }
-
-        /* PET LIST GRID ----------------------------------- */
-        .pet-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .pet-card {
-            width: 180px;
-            background: #fff;
-            border-radius: 12px;
-            padding: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-            text-align: center;
-        }
-
-        .pet-photo {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background-size: cover;
-            background-position: center;
-            margin: 0 auto 10px;
-            border: 2px solid #ffd6df;
-        }
-
-        .pet-name {
-            font-weight: bold;
-            color: #3b2d32;
-            margin-bottom: 4px;
-        }
-
-        .pet-species {
-            font-size: 0.85rem;
-            color: #75656b;
-        }
-                /* Dashboard enhancements */
-        .page-body {
             padding: 24px 32px;
             max-width: 1100px;
             margin: 0 auto;
@@ -179,6 +119,7 @@
             margin-bottom: 20px;
         }
 
+        /* STATS ROW ------------------------------------- */
         .stats-row {
             display: flex;
             flex-wrap: wrap;
@@ -214,6 +155,7 @@
             margin-top: 4px;
         }
 
+        /* MAIN LAYOUT PANELS ---------------------------- */
         .dashboard-layout {
             display: flex;
             flex-wrap: wrap;
@@ -241,6 +183,7 @@
             margin-bottom: 14px;
         }
 
+        /* PET CARDS ------------------------------------- */
         .pet-grid {
             display: flex;
             flex-wrap: wrap;
@@ -262,7 +205,9 @@
             border-radius: 50%;
             border: 3px solid #ffd4de;
             margin: 0 auto 8px;
-            background: #ffe9f0;
+            background-size: cover;
+            background-position: center;
+            background-color: #ffe9f0;
         }
 
         .pet-name {
@@ -299,58 +244,50 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         }
 
-        .task-item {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .task-item:last-child {
-            border-bottom: none;
-        }
-
-        .task-title {
-            font-weight: 600;
-            color: #3b2d32;
-            font-size: 0.95rem;
-        }
-
-        .task-date {
-            font-size: 0.85rem;
-            color: #7b6c72;
-        }
-
         .empty-text {
             font-size: 0.9rem;
             color: #7b6c72;
         }
 
-
-        /* TASKS ---------------------------------------------- */
-        .task-item {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
+        /* UPCOMING REMINDERS CARDS ---------------------- */
+        .upcoming-reminder-card {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding: 10px 0;
         }
 
-        .task-title {
-            font-weight: bold;
+        .single-reminder {
+            background: #ffffff;
+            border: 2px solid #f4b8c7;
+            padding: 18px;
+            border-radius: 14px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+
+        .single-reminder:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.08);
+            border-color: #e58aa1;
+        }
+
+        .reminder-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 4px;
             color: #3b2d32;
         }
 
-        .task-date {
-            color: #666;
+        .pet-name-inline {
+            color: #6b6b6b;
+            font-weight: 500;
+        }
+
+        .reminder-details {
             font-size: 0.9rem;
+            color: #6a6a6a;
         }
-
-        a.button {
-            display: inline-block;
-            margin-top: 8px;
-            padding: 8px 12px;
-            background: #f38aa6;
-            color: white;
-            border-radius: 8px;
-            text-decoration: none;
-        }
-
     </style>
 </head>
 <body>
@@ -402,31 +339,20 @@
 
         <div class="stat-card">
             <div class="stat-label">Upcoming reminders</div>
-            <div class="stat-value">
-                {{ upcoming_tasks|length if upcoming_tasks else 0 }}
-            </div>
-            <div class="stat-subtext">Vaccines, walks, meds & more</div>
+            <div class="stat-value">{{ upcoming_count }}</div>
+            <div class="stat-subtext">Vaccines, walks, meds &amp; more</div>
         </div>
 
         <div class="stat-card">
             <div class="stat-label">Next due</div>
-            <div class="stat-value">
-                {% if upcoming_tasks and upcoming_tasks|length > 0 %}
-                    {{ upcoming_tasks[0]["due_date"] }}
-                {% else %}
-                    —
-                {% endif %}
-            </div>
-            <div class="stat-subtext">
-                {% if upcoming_tasks and upcoming_tasks|length > 0 %}
-                    {{ upcoming_tasks[0]["title"] }}
-                    {% if upcoming_tasks[0]["pet_name"] %}
-                        for {{ upcoming_tasks[0]["pet_name"] }}
-                    {% endif %}
-                {% else %}
-                    No tasks scheduled yet
-                {% endif %}
-            </div>
+
+            {% if next_due_date %}
+                <div class="stat-value">{{ next_due_date }}</div>
+                <div class="stat-subtext">{{ next_task_title }}</div>
+            {% else %}
+                <div class="stat-value">—</div>
+                <div class="stat-subtext">No tasks scheduled yet</div>
+            {% endif %}
         </div>
     </div>
 
@@ -444,7 +370,9 @@
                 <div class="pet-grid">
                     {% for pet in pets %}
                         <div class="pet-card">
-                            <div class="pet-photo"></div>
+                            <div class="pet-photo"
+                                 style="background-image: url('{{ pet['avatar_url'] }}');">
+                            </div>
                             <div class="pet-name">{{ pet["name"] }}</div>
                             <div class="pet-species">
                                 {{ pet["species"] }}
@@ -478,24 +406,24 @@
                         medication reminders, they’ll show up here.
                     </p>
                 {% else %}
-                    {% for t in upcoming_tasks %}
-                        <div class="task-item">
-                            <div class="task-title">
-                                {{ t["title"] }}
-                                {% if t["pet_name"] %}
-                                    <span style="font-weight:normal; color:#7b6c72;">
-                                        — {{ t["pet_name"] }}
-                                    </span>
-                                {% endif %}
+                    <div class="upcoming-reminder-card">
+                        {% for t in upcoming_tasks %}
+                            <div class="single-reminder">
+                                <div class="reminder-title">
+                                    {{ t["title"] }}
+                                    {% if t["pet_name"] %}
+                                        <span class="pet-name-inline"> — {{ t["pet_name"] }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="reminder-details">
+                                    Due {{ t["due_date"] }}
+                                    {% if t["category"] %}
+                                        • {{ t["category"] }}
+                                    {% endif %}
+                                </div>
                             </div>
-                            <div class="task-date">
-                                Due {{ t["due_date"] }}
-                                {% if t["category"] %}
-                                    • {{ t["category"] }}
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    </div>
                 {% endif %}
             </div>
 
@@ -507,7 +435,5 @@
     </div>
 </main>
 
-
 </body>
 </html>
-
