@@ -459,9 +459,52 @@ def delete_task(task_id):
 @app.route("/analytics")
 @login_required
 def analytics():
-    # Simple placeholder for now
-    return "<h1>Analytics</h1><p>This page will show your pet care stats and charts soon.</p>"
+    user_id = session["user_id"]
 
+    # user + avatar for header
+    user = db.get_user_by_id(user_id)
+    if user and user["avatar_filename"]:
+        avatar_url = url_for("static", filename=f"uploads/{user['avatar_filename']}")
+    else:
+        avatar_url = url_for("static", filename="images/profile-avatar.jpg")
+    user_email = user["email"] if user else ""
+
+    # --- Analytics data from db.py ---
+    species_rows = db.get_pet_species_counts(user_id)
+    status_rows  = db.get_task_status_counts(user_id)
+    due_counts   = db.get_task_counts_by_due(user_id)
+
+    pet_species = [dict(r) for r in species_rows]
+    total_pets = sum(s["count"] for s in pet_species)
+
+    status_counts = {r["status"]: r["count"] for r in status_rows}
+    total_tasks = due_counts["total"] or 0
+
+    completed = status_counts.get("completed", 0)
+    pending   = status_counts.get("pending", 0)
+    overdue   = due_counts["overdue"] or 0
+    upcoming  = due_counts["upcoming"] or 0
+
+    completion_rate = round((completed / total_tasks) * 100) if total_tasks else 0
+
+    # For bar widths on the pet species chart
+    max_species = max((s["count"] for s in pet_species), default=0)
+    for s in pet_species:
+        s["percent"] = int((s["count"] / max_species) * 100) if max_species else 0
+
+    return render_template(
+        "analytics.html",
+        avatar_url=avatar_url,
+        user_email=user_email,
+        pet_species=pet_species,
+        total_pets=total_pets,
+        total_tasks=total_tasks,
+        completed=completed,
+        pending=pending,
+        overdue=overdue,
+        upcoming=upcoming,
+        completion_rate=completion_rate,
+    )
 
 
 

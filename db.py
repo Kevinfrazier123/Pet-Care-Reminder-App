@@ -1,4 +1,5 @@
 import sqlite3
+from flask import g
 from pathlib import Path
 from datetime import datetime, date
 
@@ -281,3 +282,51 @@ def delete_task_for_user(user_id, task_id):
     )
     conn.commit()
     conn.close()
+# --- Analytics helpers ---
+
+def get_pet_species_counts(user_id):
+    conn = get_conn()
+    rows = conn.execute(
+        """
+        SELECT species, COUNT(*) AS count
+        FROM pets
+        WHERE user_id = ?
+        GROUP BY species
+        ORDER BY count DESC
+        """,
+        (user_id,),
+    ).fetchall()
+    conn.close()
+    return rows
+
+
+def get_task_status_counts(user_id):
+    conn = get_conn()
+    rows = conn.execute(
+        """
+        SELECT status, COUNT(*) AS count
+        FROM care_tasks
+        WHERE user_id = ?
+        GROUP BY status
+        """,
+        (user_id,),
+    ).fetchall()
+    conn.close()
+    return rows
+
+
+def get_task_counts_by_due(user_id):
+    conn = get_conn()
+    row = conn.execute(
+        """
+        SELECT
+            SUM(CASE WHEN due_date < DATE('now') AND status != 'completed' THEN 1 ELSE 0 END) AS overdue,
+            SUM(CASE WHEN due_date >= DATE('now') AND status != 'completed' THEN 1 ELSE 0 END) AS upcoming,
+            COUNT(*) AS total
+        FROM care_tasks
+        WHERE user_id = ?
+        """,
+        (user_id,),
+    ).fetchone()
+    conn.close()
+    return row
