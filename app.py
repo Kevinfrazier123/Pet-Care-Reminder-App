@@ -20,6 +20,26 @@ import time
 app = Flask(__name__)
 app.secret_key = "change_this_to_something_secret"
 
+
+db.init_db()
+
+# --- create default admin user once ---
+from werkzeug.security import generate_password_hash
+
+with app.app_context():
+    admin = db.get_user_by_email("admin@admin.com")
+    if not admin:
+        password_hash = generate_password_hash("admin123")
+        db.create_user("admin@admin.com", password_hash, is_admin=1)
+
+from werkzeug.security import generate_password_hash
+
+with app.app_context():
+    admin = db.get_user_by_email("admin@admin.com")
+    if not admin:
+        password_hash = generate_password_hash("admin123")
+        db.create_user("admin", password_hash, is_admin=1)
+
 # ---- uploads for profile pictures ----
 UPLOAD_FOLDER = os.path.join(app.root_path, "static", "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -29,6 +49,14 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 def allowed_file(filename: str) -> bool:
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+# ---------- helper: login_required decorator ----------
+def login_required(view_func):
+    @wraps(view_func)
+    def wrapped_view(*args, **kwargs):
+        if "user_id" not in session:
+            return redirect(url_for("login"))
+        return view_func(*args, **kwargs)
+    return wrapped_view
 
 
 @app.route("/uploads/<path:filename>")
@@ -37,11 +65,18 @@ def uploaded_file(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 # ---------- helper: login_required decorator ----------
-def login_required(view_func):
+def admin_required(view_func):
     @wraps(view_func)
     def wrapped_view(*args, **kwargs):
-        if "user_id" not in session:
+        user_id = session.get("user_id")
+        if not user_id:
             return redirect(url_for("login"))
+
+        user = db.get_user_by_id(user_id)
+        if not user or not user["is_admin"]:
+            # not an admin → send them back to dashboard
+            return redirect(url_for("dashboard"))
+
         return view_func(*args, **kwargs)
 
     return wrapped_view
@@ -108,6 +143,7 @@ def login():
                 session["user_email"] = user["email"]
                 session["is_admin"] = bool(user["is_admin"])
                 return redirect(url_for("dashboard"))
+
 
     return render_template("login.html", error=error)
 
@@ -506,6 +542,56 @@ def analytics():
         completion_rate=completion_rate,
     )
 
+@app.route("/admin/users")
+@login_required
+@admin_required
+def admin_users():
+    user_id = session["user_id"]
+    current_user = db.get_user_by_id(user_id)
+
+    # avatar for header
+    if current_user and current_user["avatar_filename"]:
+        avatar_url = url_for(
+            "static", filename=f"uploads/{current_user['avatar_filename']}"
+        )
+    else:
+        avatar_url = url_for("static", filename="images/profile-avatar.jpg")
+
+    user_email = current_user["email"] if current_user else ""
+
+    all_users = db.get_all_users()
+
+    return render_template(
+        "admin_users.html",
+        avatar_url=avatar_url,
+        user_email=user_email,
+        users=all_users,
+        current_user_id=user_id,
+    )
+
+
+@app.route("/admin/users/<int:user_id>/toggle", methods=["POST"])
+@login_required
+@admin_required
+def admin_toggle_user(user_id):
+    # Don't let admin deactivate themselves
+    if user_id == session.get("user_id"):
+        return redirect(url_for("admin_users"))
+
+    db.toggle_user_active(user_id)
+    return redirect(url_for("admin_users"))
+
+
+@app.route("/admin/users/<int:user_id>/delete", methods=["POST"])
+@login_required
+@admin_required
+def admin_delete_user(user_id):
+    # Don't let admin delete themselves
+    if user_id == session.get("user_id"):
+        return redirect(url_for("admin_users"))
+
+    db.delete_user_and_data(user_id)
+    return redirect(url_for("admin_users"))
 
 
 if __name__ == "__main__":

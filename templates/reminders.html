@@ -434,13 +434,13 @@
           'July','August','September','October','November','December'
       ];
 
-      // --- clear only the selected state + details ---
+      // --- clearing only the selected state + details ---
       function clearSelectionUI() {
           selectedDate = null;
           selectedLabel.textContent = 'Select a highlighted date to view reminders.';
           dayList.innerHTML = '<p class="empty-text">No date selected.</p>';
 
-          // remove ring from any selected cells
+          // removing ring from any selected cells
           grid.querySelectorAll('.calendar-cell.selected-date').forEach(c => {
               c.classList.remove('selected-date');
           });
@@ -450,7 +450,7 @@
       function resetCalendarView() {
           clearSelectionUI();
 
-          // remove pink highlight from all reminder dates
+          // removing pink highlight from all reminder dates
           grid.querySelectorAll('.calendar-cell.has-reminder').forEach(c => {
               c.classList.remove('has-reminder');
           });
@@ -469,7 +469,7 @@
 
           selectedDate = dateStr;
 
-          // UI: mark this cell selected, remove selection from others
+          
           grid.querySelectorAll('.calendar-cell.selected-date').forEach(c => {
               c.classList.remove('selected-date');
           });
@@ -479,7 +479,7 @@
 
           dayList.innerHTML = '';
 
-          // ✅ allTasks is an object keyed by date
+          //  allTasks is an object keyed by date
           const tasks = allTasks[dateStr] || [];
           const niceDate = new Date(dateStr + 'T00:00:00');
 

@@ -330,3 +330,50 @@ def get_task_counts_by_due(user_id):
     ).fetchone()
     conn.close()
     return row
+def get_all_users():
+    """Return all users for the admin panel."""
+    conn = get_conn()
+    rows = conn.execute(
+        """
+        SELECT *
+        FROM users
+        ORDER BY created_at DESC
+        """
+    ).fetchall()
+    conn.close()
+    return rows
+
+
+def toggle_user_active(user_id):
+    """Flip is_active between 1 and 0 for this user."""
+    conn = get_conn()
+    row = conn.execute(
+        "SELECT is_active FROM users WHERE id = ?",
+        (user_id,),
+    ).fetchone()
+
+    if row is not None:
+        new_val = 0 if row["is_active"] else 1
+        conn.execute(
+            "UPDATE users SET is_active = ? WHERE id = ?",
+            (new_val, user_id),
+        )
+        conn.commit()
+
+    conn.close()
+
+
+def delete_user_and_data(user_id):
+    """
+    Delete a user and their related data (pets + care_tasks).
+    Use carefully – for admin panel only.
+    """
+    conn = get_conn()
+
+    # Remove related tasks and pets first
+    conn.execute("DELETE FROM care_tasks WHERE user_id = ?", (user_id,))
+    conn.execute("DELETE FROM pets WHERE user_id = ?", (user_id,))
+    conn.execute("DELETE FROM users WHERE id = ?", (user_id,))
+
+    conn.commit()
+    conn.close()

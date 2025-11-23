@@ -305,6 +305,9 @@
         <a href="{{ url_for('reminders') }}" class="header-tab">Reminders</a>
         <a href="{{ url_for('analytics') }}" class="header-tab">Analytics</a>
         <a href="{{ url_for('profile') }}" class="header-tab">My Profile</a>
+        {% if session.get('is_admin') %}
+            <a href="{{ url_for('admin_users') }}" class="header-tab">Admin</a>
+        {% endif %}
     </nav>
 
     <div class="header-right">
@@ -312,7 +315,9 @@
            style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
             <div>
                 <div class="profile-name">{{ session.get('user_email') }}</div>
-                <div class="profile-role">Pet Owner</div>
+                <div class="profile-role">
+                    {% if session.get('is_admin') %}Admin{% else %}Pet Owner{% endif %}
+                </div>
             </div>
             <div class="profile-avatar" style="background-image: url('{{ avatar_url }}');"></div>
         </a>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin – User Management</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f6;
+        }
+
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            background: #f7bccc;
+            border-bottom: 1px solid #e09cad;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f38aa6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .app-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #4c3f45;
+        }
+
+        .header-tabs {
+            display: flex;
+            gap: 18px;
+        }
+
+        .header-tab {
+            font-size: 0.95rem;
+            color: #6b5a60;
+            padding-bottom: 3px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .header-tab.active {
+            font-weight: bold;
+            border-bottom: 2px solid #b6534d;
+            color: #3b2d32;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-name {
+            font-size: 0.9rem;
+            color: #4c3f45;
+            text-align: right;
+        }
+
+        .profile-role {
+            font-size: 0.75rem;
+            color: #8b7a81;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+        }
+
+        .logout-link {
+            font-size: 0.8rem;
+            color: #8a2f2b;
+            text-decoration: none;
+        }
+
+        /* Page body */
+        .page-body {
+            padding: 24px 32px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #3c3035;
+            margin-bottom: 6px;
+        }
+
+        .page-subtitle {
+            font-size: 0.95rem;
+            color: #7b6c72;
+            margin-bottom: 20px;
+        }
+
+        .admin-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        table.user-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .user-table th,
+        .user-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        .user-table th {
+            font-weight: 600;
+            color: #5b4d53;
+        }
+
+        .user-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+        }
+
+        .badge-active {
+            background: #d9f5dd;
+            color: #256436;
+        }
+
+        .badge-inactive {
+            background: #fde0e0;
+            color: #8e2f2f;
+        }
+
+        .badge-admin {
+            background: #fbe1ff;
+            color: #7a277d;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .btn-toggle {
+            background: #fbe1e7;
+            color: #6c2f35;
+        }
+
+        .btn-toggle:hover {
+            background: #f4c4d0;
+        }
+
+        .btn-delete {
+            background: #f7c5c1;
+            color: #7c2622;
+        }
+
+        .btn-delete:hover {
+            background: #ef9f98;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<header class="header-bar">
+    <div class="header-left">
+        <div class="logo-circle">P</div>
+        <div class="app-name">Pet Care Reminder</div>
+    </div>
+
+    <nav class="header-tabs">
+        <a href="{{ url_for('dashboard') }}" class="header-tab">Dashboard</a>
+        <a href="{{ url_for('my_pets') }}" class="header-tab">My Pets</a>
+        <a href="{{ url_for('reminders') }}" class="header-tab">Reminders</a>
+        <a href="{{ url_for('analytics') }}" class="header-tab">Analytics</a>
+        <a href="{{ url_for('profile') }}" class="header-tab">My Profile</a>
+        <a href="{{ url_for('admin_users') }}" class="header-tab active">Admin</a>
+    </nav>
+
+    <div class="header-right">
+        <a href="{{ url_for('profile') }}"
+           style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px;">
+            <div>
+                <div class="profile-name">{{ user_email }}</div>
+                <div class="profile-role">Admin</div>
+            </div>
+            <div class="profile-avatar" style="background-image:url('{{ avatar_url }}');"></div>
+        </a>
+        <a href="{{ url_for('logout') }}" class="logout-link">Log out</a>
+    </div>
+</header>
+
+<main class="page-body">
+    <h1 class="page-title">Admin Panel</h1>
+    <p class="page-subtitle">
+        Manage user accounts. You can activate/deactivate or delete users if needed.
+    </p>
+
+    <div class="admin-card">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Full name</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                    <tr>
+                        <td>{{ u.email }}</td>
+                        <td>{{ u.full_name or "—" }}</td>
+                        <td>
+                            {% if u.is_admin %}
+                                <span class="badge badge-admin">Admin</span>
+                            {% else %}
+                                User
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if u.is_active %}
+                                <span class="badge badge-active">Active</span>
+                            {% else %}
+                                <span class="badge badge-inactive">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ u.created_at[:10] if u.created_at }}</td>
+                        <td>
+                            <div class="actions-cell">
+                                {% if u.id != current_user_id %}
+                                    <form method="POST" action="{{ url_for('admin_toggle_user', user_id=u.id) }}">
+                                        <button type="submit" class="btn-small btn-toggle">
+                                            {% if u.is_active %}Deactivate{% else %}Activate{% endif %}
+                                        </button>
+                                    </form>
+                                    <form method="POST"
+                                          action="{{ url_for('admin_delete_user', user_id=u.id) }}"
+                                          onsubmit="return confirm('Delete this user and all their pets/reminders?');">
+                                        <button type="submit" class="btn-small btn-delete">Delete</button>
+                                    </form>
+                                {% else %}
+                                    <span style="font-size:0.8rem; color:#888;">(You)</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+
+</body>
+</html>
